@@ -1,0 +1,6 @@
+[33maaa3170[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Merge remote README and add A2 documentation
+[33mebcda1c[m Add tasks.db to gitignore
+[33me50fd64[m Remove tasks.db from tracking
+[33m72c24b8[m Stage 0-4: SQLite database with full CRUD
+[33m6864a53[m[33m ([m[1;31morigin/main[m[33m)[m Create README.md for Task API
+[33m95ba386[m Stage 0-4: Complete CRUD API with FastAPI

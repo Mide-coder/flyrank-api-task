@@ -6,10 +6,18 @@ import os
 import psycopg
 from dotenv import load_dotenv
 
+
 env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
 load_dotenv(dotenv_path=env_path)
 DATABASE_URL = os.getenv("DATABASE_URL")
 print(f"Loaded DATABASE_URL: {DATABASE_URL is not None}")
+
+from supabase import create_client, Client
+
+supabase: Client = create_client(
+    os.getenv("SUPABASE_URL"), 
+    os.getenv("SUPABASE_KEY")
+    )
 
 def get_db_connection():
     return psycopg.connect(DATABASE_URL)
@@ -148,3 +156,37 @@ def delete_task(task_id: int):
     conn.commit()
     conn.close()
     return JSONResponse(status_code=204, content={})
+
+@app.post("/auth/signup", summary="Sign Up")
+def signup(credentials: dict):
+    email = credentials.get("email")
+    password = credentials.get("password")
+    
+    if not email or not password:
+        return JSONResponse(status_code=400, content={"error": "Email and password required"})
+    
+    try:
+        result = supabase.auth.sign_up({"email": email, "password": password})
+        return JSONResponse(status_code=201, content={"user": result.user.model_dump()})
+    except Exception as e:
+        return JSONResponse(status_code=400, content={"error": str(e)})
+
+
+
+@app.post("/auth/login", summary="Log In")
+def login(credentials: dict):
+    email = credentials.get("email")
+    password = credentials.get("password")
+    
+    if not email or not password:
+        return JSONResponse(status_code=400, content={"error": "Email and password required"})
+    
+    try:
+        result = supabase.auth.sign_in_with_password({"email": email, "password": password})
+        return {
+            "access_token": result.session.access_token,
+            "refresh_token": result.session.refresh_token,
+            "user": result.user.model_dump()
+        }
+    except Exception as e:
+        return JSONResponse(status_code=401, content={"error": "Invalid credentials"})

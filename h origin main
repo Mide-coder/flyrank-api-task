@@ -1,0 +1,11 @@
+[33m4086148[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Stage 1: Signup and login routes with Supabase Auth
+[33mfeefa33[m[33m ([m[1;31morigin/main[m[33m)[m Stage 5 Updated Readme for dockerfile and yaml
+[33md243028[m Stage 4b: Add Dockerfile
+[33m226aa00[m Stage 4: Add Dockerfile and docker-compose
+[33m49f95b6[m Stage 1-3: Full CRUD on PostgreSQL with psycopg
+[33maaa3170[m Merge remote README and add A2 documentation
+[33mebcda1c[m Add tasks.db to gitignore
+[33me50fd64[m Remove tasks.db from tracking
+[33m72c24b8[m Stage 0-4: SQLite database with full CRUD
+[33m6864a53[m Create README.md for Task API
+[33m95ba386[m Stage 0-4: Complete CRUD API with FastAPI

@@ -1,10 +1,29 @@
 from fastapi import FastAPI, HTTPException
+from fastapi import Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import Optional
 import os
 import psycopg
 from dotenv import load_dotenv
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
+security = HTTPBearer()
+
+def get_current_user(request: Request):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Access token required")
+    
+    token = auth_header.replace("Bearer ", "")
+    
+    # Use Supabase to verify the token and get user info
+    try:
+        user = supabase.auth.get_user(token)
+        return user.user
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
 
 
 env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
@@ -190,3 +209,32 @@ def login(credentials: dict):
         }
     except Exception as e:
         return JSONResponse(status_code=401, content={"error": "Invalid credentials"})
+
+@app.get("/public/info", summary="Get Public information")
+def get_public_info():
+    return {"message": "This is public information."}
+@app.get("/protected/profile", summary="Protected Profile")
+def protected_profile(current_user: dict = Depends(get_current_user)):
+    return {
+        "message": "Profile accessed",
+        "user_id": current_user.id,
+        "email": current_user.email
+    }   
+
+@app.get("/protected/dashboard", summary="Protected Dashboard")
+def protected_dashboard(user=Depends(get_current_user)):
+    return {
+        "message": "Dashboard accessed",
+        "user_id": user.id,
+        "tasks_count": "Coming soon..."
+    }
+
+@app.post("/auth/logout", summary="Log Out")
+def logout(get_current_user: dict = Depends(get_current_user)):
+    # Here you would typically invalidate the token on the server-side
+    try:
+        supabase.auth.sign_out()    
+        return JSONResponse(status_code=200, content={"message": "Logged out successfully"})
+    except Exception as e:
+        return JSONResponse(status_code=400, content={"error": str(e)})
+    
